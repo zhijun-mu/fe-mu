@@ -40,22 +40,36 @@ instance.interceptors.request.use(
 // 响应拦截器
 instance.interceptors.response.use(
   (response: AxiosResponse<ResponseResult<any>>) => {
+    // 二进制数据直接返回
+    const responseType = response.config.responseType;
+    if (responseType === "blob" || responseType === "arraybuffer") {
+      return response.data;
+    }
+
     const { code, data, message } = response.data;
 
     if (code === 0) return data;
 
-    switch (code) {
-      case 1101:
-        removeToken();
-        router.navigate("/login", { replace: true }).then(() => {});
+    if (code === 1101) {
+      removeToken();
+      router.navigate("/login", { replace: true }).then(() => {});
+    } else {
+      error(message || "未知错误！");
     }
-    error(message || "未知错误！");
-    throw new Error(message || "未知错误！");
+
+    return Promise.reject(new Error(message));
   },
-  (error) => {
-    // 可以在这里统一处理错误
-    console.error("请求失败:", error);
-    return Promise.reject(error);
+  (err) => {
+    let { message } = err;
+    if (message == "Network Error") {
+      message = "后端接口连接异常";
+    } else if (message.includes("timeout")) {
+      message = "系统接口请求超时";
+    } else if (message.includes("Request failed with status code")) {
+      message = "系统接口" + message.substr(message.length - 3) + "异常";
+    }
+    error(message);
+    return Promise.reject(new Error(message));
   },
 );
 
