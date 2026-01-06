@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 export default function HomePage() {
   function aaa() {
-    post("/sys/auth/logout").then((r) => {});
+    post("/sys/auth/logout").then(() => {});
   }
 
   useEffect(() => {});

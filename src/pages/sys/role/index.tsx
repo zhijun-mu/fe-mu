@@ -1,3 +1,3 @@
-export default function RolePage() {
+export default function SysRolePage() {
   return <>Role</>;
 }
