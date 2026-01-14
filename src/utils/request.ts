@@ -2,6 +2,7 @@ import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse 
 import { router } from "@/routes";
 import { useAuthStore } from "@/stores";
 import { error } from "./message";
+import { AuthError, NetworkError } from "@/errors";
 
 /**
  * 后端响应信息主体
@@ -49,13 +50,13 @@ instance.interceptors.response.use(
     if (code === 0) return data;
 
     if (code === 1101) {
-      useAuthStore.getState().logout();
+      useAuthStore.getState().clearAuth();
       router.navigate("/login", { replace: true }).then(() => {});
     } else {
       error(message || "未知错误！");
     }
 
-    return Promise.reject(new Error(message));
+    return Promise.reject(new AuthError(message));
   },
   (err) => {
     let { message } = err;
@@ -67,7 +68,7 @@ instance.interceptors.response.use(
       message = "系统接口" + message.substr(message.length - 3) + "异常";
     }
     error(message);
-    return Promise.reject(new Error(message));
+    return Promise.reject(new NetworkError(message));
   },
 );
 
