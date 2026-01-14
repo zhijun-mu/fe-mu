@@ -1,6 +1,6 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from "axios";
 import { router } from "@/routes";
-import { hasToken, getToken, removeToken } from "./token";
+import { useAuthStore } from "@/stores";
 import { error } from "./message";
 
 /**
@@ -24,10 +24,8 @@ instance.interceptors.request.use(
   (config) => {
     if (config.skipAuth) return config;
 
-    if (hasToken()) {
-      config.headers = config.headers ?? {};
-      config.headers["X-TOKEN"] = getToken();
-    }
+    config.headers = config.headers ?? {};
+    config.headers["X-TOKEN"] = useAuthStore.getState().token;
 
     return config;
   },
@@ -51,7 +49,7 @@ instance.interceptors.response.use(
     if (code === 0) return data;
 
     if (code === 1101) {
-      removeToken();
+      useAuthStore.getState().logout();
       router.navigate("/login", { replace: true }).then(() => {});
     } else {
       error(message || "未知错误！");

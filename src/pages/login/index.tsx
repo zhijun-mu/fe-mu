@@ -18,16 +18,19 @@ import {
 } from "@ant-design/pro-components";
 import { Space, Tabs, message, theme } from "antd";
 
-import { passwordLogin } from "@/api/auth.ts";
-import { hasToken, setToken } from "@/utils/token";
+import { passwordLogin, getLoginInfo } from "@/api/auth.ts";
+import { useAuthStore } from "@/stores";
 
-type LoginType = "password" | "phone";
+type LoginType = "password" | "email";
 
 export default function LoginPage() {
   const { token } = theme.useToken();
   const [loginType, setLoginType] = useState<LoginType>("password");
 
   const navigate = useNavigate();
+  const { isAuthenticated, setToken, setUserInfo } = useAuthStore.getState();
+
+  const [loading, setLoading] = useState(false);
 
   const iconStyles: CSSProperties = {
     marginInlineStart: "16px",
@@ -39,15 +42,31 @@ export default function LoginPage() {
 
   const handleFinish = async (values: any) => {
     // 账号登录请求
-    if (loginType === "password") {
+    /*    if (loginType === "password") {
       passwordLogin(values).then((data: any) => {
-        setToken(data.token);
+        login(data.token);
         navigate("/", { replace: true });
       });
+    }*/
+
+    setLoading(true);
+    try {
+      const data: any =
+        loginType === "password" ? await passwordLogin(values) : await passwordLogin(values);
+
+      const token = data.token;
+      setToken(token);
+
+      const info = await getLoginInfo();
+      setUserInfo(info);
+
+      navigate("/", { replace: true });
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (hasToken()) {
+  if (isAuthenticated) {
     return <Navigate to="/" replace />;
   }
 
@@ -58,7 +77,6 @@ export default function LoginPage() {
           logo="https://github.githubassets.com/favicons/favicon.png"
           title="Github"
           subTitle="全球最大的代码托管平台"
-          onFinish={handleFinish}
           actions={
             <Space>
               其他登录方式
@@ -67,6 +85,8 @@ export default function LoginPage() {
               <WeiboCircleOutlined style={iconStyles} />
             </Space>
           }
+          loading={loading}
+          onFinish={handleFinish}
         >
           <Tabs
             centered
@@ -74,7 +94,7 @@ export default function LoginPage() {
             onChange={(activeKey) => setLoginType(activeKey as LoginType)}
           >
             <Tabs.TabPane key={"password"} tab={"账号密码登录"} />
-            <Tabs.TabPane key={"phone"} tab={"手机号登录"} />
+            <Tabs.TabPane key={"email"} tab={"邮箱登录"} />
           </Tabs>
           {loginType === "password" && (
             <>
@@ -129,7 +149,7 @@ export default function LoginPage() {
               />
             </>
           )}
-          {loginType === "phone" && (
+          {loginType === "email" && (
             <>
               <ProFormText
                 fieldProps={{
