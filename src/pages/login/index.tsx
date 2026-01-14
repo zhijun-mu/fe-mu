@@ -15,7 +15,7 @@ import {
   ProFormText,
   setAlpha,
 } from "@ant-design/pro-components";
-import { Space, Tabs, message, theme, Alert } from "antd";
+import { Space, Tabs, message, theme, Alert, Form } from "antd";
 
 import { passwordLogin, getLoginInfo } from "@/api/auth.ts";
 import { useAuthStore } from "@/stores";
@@ -28,11 +28,19 @@ type LoginType = "password" | "email";
 export default function LoginPage() {
   const { token } = theme.useToken();
   const [loginType, setLoginType] = useState<LoginType>("password");
-  const { isAuthenticated, setToken, setUserInfo } = useAuthStore.getState();
+  const {
+    isAuthenticated,
+    setToken,
+    setUserInfo,
+    rememberedUsername,
+    setRememberedUsername,
+    setIsRememberUsername,
+  } = useAuthStore.getState();
   const [errMessage, setErrMessage] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
+  const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
   const iconStyles: CSSProperties = {
@@ -44,6 +52,7 @@ export default function LoginPage() {
   };
 
   const handleFinish = async (values: any) => {
+    console.log(values);
     setLoading(true);
     setErrMessage(null);
     try {
@@ -55,6 +64,14 @@ export default function LoginPage() {
 
       const info = await getLoginInfo();
       setUserInfo(info);
+
+      if (values.isRememberUsername) {
+        setIsRememberUsername(true);
+        setRememberedUsername(values.username);
+      } else {
+        setIsRememberUsername(false);
+        setRememberedUsername(null);
+      }
 
       navigate("/", { replace: true });
     } catch (err) {
@@ -74,11 +91,22 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, navigate]);
 
+  useEffect(() => {
+    // 只有在“未登录”且“有记住的用户名”时才回填
+    if (!isAuthenticated && rememberedUsername) {
+      form.setFieldsValue({
+        username: rememberedUsername,
+        isRememberUsername: true,
+      });
+    }
+  }, [isAuthenticated, rememberedUsername, form]);
+
   return (
     <>
       <div className={styles.container}>
         <div style={{ flex: 1, padding: "32px 0" }}>
           <LoginForm
+            form={form}
             logo="https://github.githubassets.com/favicons/favicon.png"
             title="Github"
             subTitle="全球最大的代码托管平台"
@@ -92,6 +120,13 @@ export default function LoginPage() {
             }
             loading={loading}
             onFinish={handleFinish}
+            onValuesChange={(changedValues) => {
+              if (changedValues.username) {
+                // 只要动了用户名，就取消“记住用户名”的勾选
+                // 逻辑：修改了名字意味着可能换人，之前的记住状态不再适用
+                form.setFieldValue("rememberUsername", false);
+              }
+            }}
           >
             <Tabs
               centered
@@ -141,27 +176,6 @@ export default function LoginPage() {
                   fieldProps={{
                     size: "large",
                     prefix: <LockOutlined className={"prefixIcon"} />,
-                    strengthText:
-                      "Password should contain numbers, letters and special characters, at least 8 characters long.",
-                    statusRender: (value) => {
-                      const getStatus = () => {
-                        if (value && value.length > 12) {
-                          return "ok";
-                        }
-                        if (value && value.length > 6) {
-                          return "pass";
-                        }
-                        return "poor";
-                      };
-                      const status = getStatus();
-                      if (status === "pass") {
-                        return <div style={{ color: token.colorWarning }}>强度：中</div>;
-                      }
-                      if (status === "ok") {
-                        return <div style={{ color: token.colorSuccess }}>强度：强</div>;
-                      }
-                      return <div style={{ color: token.colorError }}>强度：弱</div>;
-                    },
                   }}
                   placeholder={"密码"}
                   rules={[
@@ -226,8 +240,8 @@ export default function LoginPage() {
                 marginBlockEnd: 24,
               }}
             >
-              <ProFormCheckbox noStyle name="autoLogin">
-                自动登录
+              <ProFormCheckbox noStyle name="isRememberUsername">
+                记住用户名
               </ProFormCheckbox>
               <a
                 style={{

@@ -8,6 +8,10 @@ type AuthState = {
   setToken: (token: string) => void;
   setUserInfo: (userInfo: any) => void;
   clearAuth: () => void;
+  isRememberUsername: boolean;
+  setIsRememberUsername: (isRemember: boolean) => void;
+  rememberedUsername: string | null;
+  setRememberedUsername: (username: string | null) => void;
 };
 
 const useAuthStore = create<AuthState>()(
@@ -19,6 +23,11 @@ const useAuthStore = create<AuthState>()(
       setToken: (token: string) => set({ token, isAuthenticated: true }),
       setUserInfo: (userInfo: any) => set({ userInfo }),
       clearAuth: async () => set({ token: null, isAuthenticated: false, userInfo: null }),
+
+      isRememberUsername: false,
+      setIsRememberUsername: (isRemember: boolean) => set({ isRememberUsername: isRemember }),
+      rememberedUsername: null,
+      setRememberedUsername: (username: string | null) => set({ rememberedUsername: username }),
     }),
     {
       name: "mu-auth-store",
