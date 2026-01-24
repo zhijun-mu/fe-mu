@@ -1,12 +1,11 @@
+import { lazy } from "react";
 import { createBrowserRouter, Navigate } from "react-router";
 
 import AdminLayout from "@/layouts/AdminLayout";
 import NotFound from "@/components/not-found";
-import HomePage from "@/pages/home";
-import SysUserPage from "@/pages/sys/user";
-import SysRolePage from "@/pages/sys/role";
+
 import LoginPage from "@/pages/login";
-import ExamplePage from "@/pages/example";
+import lazyLoad from "@/routes/lazyLoad.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -14,12 +13,15 @@ export const router = createBrowserRouter([
     element: <AdminLayout />,
     children: [
       { index: true, element: <Navigate to="/home" replace /> },
-      { path: "home", element: <HomePage /> },
+      {
+        path: "home",
+        element: lazyLoad(lazy(() => import("@/pages/home"))),
+      },
       {
         path: "sys",
         children: [
-          { path: "user", element: <SysUserPage /> },
-          { path: "role", element: <SysRolePage /> },
+          { path: "user", element: lazyLoad(lazy(() => import("@/pages/sys/user"))) },
+          { path: "role", element: lazyLoad(lazy(() => import("@/pages/sys/role"))) },
         ],
       },
     ],
@@ -30,7 +32,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "example",
-    element: <ExamplePage />,
+    element: lazyLoad(lazy(() => import("@/pages/example"))),
   },
   { path: "*", element: <NotFound /> },
 ]);

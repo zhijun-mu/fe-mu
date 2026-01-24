@@ -1,19 +1,36 @@
 import { useNavigate } from "react-router";
-import { Result, Button } from "antd";
 
 export default function NotFound() {
   const navigate = useNavigate();
 
   return (
-    <Result
-      status="404"
-      title="404"
-      subTitle="抱歉，您访问的页面不存在。"
-      extra={
-        <Button type="primary" onClick={() => navigate("/", { replace: true })}>
-          返回首页
-        </Button>
-      }
-    />
+    <>
+      <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">
+        <div className="text-center">
+          <p className="text-base font-semibold text-indigo-600">404</p>
+          <h1 className="mt-4 text-5xl font-semibold tracking-tight text-balance text-gray-900 sm:text-7xl">
+            页面不存在
+          </h1>
+          <p className="mt-6 text-lg font-medium text-pretty text-gray-500 sm:text-xl/8">
+            抱歉，我们找不到您要访问的页面。
+          </p>
+          <div className="mt-10 flex items-center justify-center gap-x-6">
+            <a
+              href="#"
+              className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              onClick={(e) => {
+                e.preventDefault(); // 阻止 a 标签默认行为，防止 URL 变为 /#
+                navigate("/", { replace: true });
+              }}
+            >
+              返回首页
+            </a>
+            <a href="#" className="text-sm font-semibold text-gray-900">
+              联系支持 <span aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+        </div>
+      </main>
+    </>
   );
 }

@@ -3,6 +3,8 @@ import { router } from "@/routes";
 import { message } from "antd";
 import { setMessageApi } from "@/utils/message";
 
+import "./styles/app.css";
+
 export default function App() {
   const [messageApi, contextHolder] = message.useMessage();
   setMessageApi(messageApi);
