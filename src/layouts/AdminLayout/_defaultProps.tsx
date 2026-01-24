@@ -15,6 +15,10 @@ export default {
         icon: <AppstoreOutlined />,
         routes: [
           {
+            path: "/sys/user",
+            name: "用户管理",
+          },
+          {
             path: "/sys/role",
             name: "角色管理",
           },
