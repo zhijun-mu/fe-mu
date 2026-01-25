@@ -1,257 +1,43 @@
-import { type CSSProperties, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
-import {
-  AlipayCircleOutlined,
-  LockOutlined,
-  MobileOutlined,
-  TaobaoCircleOutlined,
-  UserOutlined,
-  WeiboCircleOutlined,
-} from "@ant-design/icons";
-import {
-  LoginForm,
-  ProFormCaptcha,
-  ProFormCheckbox,
-  ProFormText,
-  setAlpha,
-} from "@ant-design/pro-components";
-import { Space, Tabs, message, theme, Alert, Form } from "antd";
-
-import { passwordLogin, getLoginInfo } from "@/api/auth.ts";
-import { useAuthStore } from "@/stores";
-import { AppError } from "@/errors";
-
-import styles from "./index.module.css";
-
-type LoginType = "password" | "email";
+import { UserAuthForm } from "@/pages/login/components/user-auth-form.tsx";
 
 export default function LoginPage() {
-  const { token } = theme.useToken();
-  const [loginType, setLoginType] = useState<LoginType>("password");
-  const {
-    isAuthenticated,
-    setToken,
-    setUserInfo,
-    rememberedUsername,
-    setRememberedUsername,
-    setIsRememberUsername,
-  } = useAuthStore.getState();
-  const [errMessage, setErrMessage] = useState<string | null>(null);
-
-  const navigate = useNavigate();
-
-  const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
-
-  const iconStyles: CSSProperties = {
-    marginInlineStart: "16px",
-    color: setAlpha(token.colorTextBase, 0.2),
-    fontSize: "24px",
-    verticalAlign: "middle",
-    cursor: "pointer",
-  };
-
-  const handleFinish = async (values: any) => {
-    console.log(values);
-    setLoading(true);
-    setErrMessage(null);
-    try {
-      const data: any =
-        loginType === "password" ? await passwordLogin(values) : await passwordLogin(values);
-
-      const token = data.token;
-      setToken(token);
-
-      const info = await getLoginInfo();
-      setUserInfo(info);
-
-      if (values.isRememberUsername) {
-        setIsRememberUsername(true);
-        setRememberedUsername(values.username);
-      } else {
-        setIsRememberUsername(false);
-        setRememberedUsername(null);
-      }
-
-      navigate("/", { replace: true });
-    } catch (err) {
-      if (err instanceof AppError) {
-        setErrMessage(err.message);
-      } else {
-        setErrMessage("未知错误！");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/", { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
-
-  useEffect(() => {
-    // 只有在“未登录”且“有记住的用户名”时才回填
-    if (!isAuthenticated && rememberedUsername) {
-      form.setFieldsValue({
-        username: rememberedUsername,
-        isRememberUsername: true,
-      });
-    }
-  }, [isAuthenticated, rememberedUsername, form]);
-
   return (
     <>
-      <div className={styles.container}>
-        <div style={{ flex: 1, padding: "32px 0" }}>
-          <LoginForm
-            form={form}
-            logo="https://github.githubassets.com/favicons/favicon.png"
-            title="Github"
-            subTitle="全球最大的代码托管平台"
-            actions={
-              <Space>
-                其他登录方式
-                <AlipayCircleOutlined style={iconStyles} />
-                <TaobaoCircleOutlined style={iconStyles} />
-                <WeiboCircleOutlined style={iconStyles} />
-              </Space>
-            }
-            loading={loading}
-            onFinish={handleFinish}
-            onValuesChange={(changedValues) => {
-              if (changedValues.username) {
-                // 只要动了用户名，就取消“记住用户名”的勾选
-                // 逻辑：修改了名字意味着可能换人，之前的记住状态不再适用
-                form.setFieldValue("rememberUsername", false);
-              }
-            }}
-          >
-            <Tabs
-              centered
-              items={[
-                {
-                  key: "password",
-                  label: "账号密码登录",
-                },
-                {
-                  key: "email",
-                  label: "邮箱登录",
-                },
-              ]}
-              activeKey={loginType}
-              onChange={(activeKey) => setLoginType(activeKey as LoginType)}
-            />
-
-            {!!errMessage && (
-              <Alert
-                style={{
-                  marginBottom: 24,
-                }}
-                title={errMessage}
-                type="error"
-                showIcon
-              />
-            )}
-
-            {loginType === "password" && (
-              <>
-                <ProFormText
-                  name="username"
-                  fieldProps={{
-                    size: "large",
-                    prefix: <UserOutlined className={"prefixIcon"} />,
-                  }}
-                  placeholder={"用户名"}
-                  rules={[
-                    {
-                      required: true,
-                      message: "请输入用户名!",
-                    },
-                  ]}
-                />
-                <ProFormText.Password
-                  name="password"
-                  fieldProps={{
-                    size: "large",
-                    prefix: <LockOutlined className={"prefixIcon"} />,
-                  }}
-                  placeholder={"密码"}
-                  rules={[
-                    {
-                      required: true,
-                      message: "请输入密码！",
-                    },
-                  ]}
-                />
-              </>
-            )}
-            {loginType === "email" && (
-              <>
-                <ProFormText
-                  fieldProps={{
-                    size: "large",
-                    prefix: <MobileOutlined className={"prefixIcon"} />,
-                  }}
-                  name="mobile"
-                  placeholder={"手机号"}
-                  rules={[
-                    {
-                      required: true,
-                      message: "请输入手机号！",
-                    },
-                    {
-                      pattern: /^1\d{10}$/,
-                      message: "手机号格式错误！",
-                    },
-                  ]}
-                />
-                <ProFormCaptcha
-                  fieldProps={{
-                    size: "large",
-                    prefix: <LockOutlined className={"prefixIcon"} />,
-                  }}
-                  captchaProps={{
-                    size: "large",
-                  }}
-                  placeholder={"请输入验证码"}
-                  captchaTextRender={(timing, count) => {
-                    if (timing) {
-                      return `${count} ${"获取验证码"}`;
-                    }
-                    return "获取验证码";
-                  }}
-                  name="captcha"
-                  rules={[
-                    {
-                      required: true,
-                      message: "请输入验证码！",
-                    },
-                  ]}
-                  onGetCaptcha={async () => {
-                    message.success("获取验证码成功！验证码为：1234");
-                  }}
-                />
-              </>
-            )}
-            <div
-              style={{
-                marginBlockEnd: 24,
-              }}
+      <div className="relative container hidden flex-1 shrink-0 items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+        <div className="text-primary relative hidden h-full flex-col p-10 lg:flex dark:border-r">
+          <div className="bg-primary/5 absolute inset-0" />
+          <div className="relative z-20 flex items-center text-lg font-medium">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="mr-2 h-6 w-6"
             >
-              <ProFormCheckbox noStyle name="isRememberUsername">
-                记住用户名
-              </ProFormCheckbox>
-              <a
-                style={{
-                  float: "right",
-                }}
-              >
-                忘记密码
-              </a>
+              <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
+            </svg>
+            Acme Inc
+          </div>
+          <div className="relative z-20 mt-auto">
+            <blockquote className="leading-normal text-balance">
+              &ldquo;This library has saved me countless hours of work and helped me deliver
+              stunning designs to my clients faster than ever before.&rdquo; - Sofia Davis
+            </blockquote>
+          </div>
+        </div>
+        <div className="flex items-center justify-center lg:h-[1000px] lg:p-8">
+          <div className="mx-auto flex w-full flex-col justify-center gap-6 sm:w-[350px]">
+            <div className="flex flex-col gap-2 text-center">
+              <h1 className="text-2xl font-semibold tracking-tight">登录</h1>
+              <p className="text-muted-foreground text-sm">
+                请在下方输入您的用户名以登录您的账户。
+              </p>
             </div>
-          </LoginForm>
+            <UserAuthForm />
+          </div>
         </div>
       </div>
     </>
