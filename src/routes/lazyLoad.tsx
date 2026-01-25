@@ -4,7 +4,7 @@ import Spin from "@/components/Spin";
 
 const lazyLoad = (Comp: React.LazyExoticComponent<any>): React.ReactNode => {
   return (
-    <Suspense fallback={<Spin size="large" className="min-h-screen" />}>
+    <Suspense fallback={<Spin size="large" className="h-full" />}>
       <Comp />
     </Suspense>
   );

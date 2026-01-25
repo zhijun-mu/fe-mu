@@ -1,8 +1,9 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from "axios";
 import { router } from "@/routes";
 import { useAuthStore } from "@/stores";
-import { error } from "./message";
 import { AuthError, NetworkError } from "@/errors";
+
+import { toast } from "sonner";
 
 /**
  * 后端响应信息主体
@@ -53,7 +54,7 @@ instance.interceptors.response.use(
       useAuthStore.getState().clearAuth();
       router.navigate("/login", { replace: true }).then(() => {});
     } else {
-      error(message || "未知错误！");
+      toast.error(message || "未知错误！");
     }
 
     return Promise.reject(new AuthError(message));
@@ -67,7 +68,7 @@ instance.interceptors.response.use(
     } else if (message.includes("Request failed with status code")) {
       message = "系统接口" + message.substr(message.length - 3) + "异常";
     }
-    error(message);
+    toast.error(message);
     return Promise.reject(new NetworkError(message));
   },
 );
