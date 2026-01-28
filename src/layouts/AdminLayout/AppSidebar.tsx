@@ -97,8 +97,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
+            {/* 使用专门处理第一级菜单的组件 */}
             {data.navMain.map((item) => (
-              <NavMainItem key={item.title} item={item} />
+              <SidebarItem key={item.title} item={item} />
             ))}
           </SidebarMenu>
         </SidebarGroup>
@@ -139,10 +140,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   );
 }
 
-// ----------------------------------------------------------------------
-// 递归渲染组件：不再区分 Root/Sub，统一由判断 items 决定结构
-// ----------------------------------------------------------------------
-function NavMainItem({ item }: { item: MenuItem }) {
+// =====================================================================
+// 核心修复：将渲染拆分为“第一级”和“子级”，避免 HTML 嵌套错误
+// =====================================================================
+
+// 1. 处理第一级菜单 (Root Level)
+// 使用 SidebarMenuItem 和 SidebarMenuButton
+function SidebarItem({ item }: { item: MenuItem }) {
   const location = useLocation();
   const navigate = useNavigate();
   const hasChildren = item.items && item.items.length > 0;
@@ -175,24 +179,60 @@ function NavMainItem({ item }: { item: MenuItem }) {
         </CollapsibleTrigger>
         <CollapsibleContent>
           <SidebarMenuSub>
+            {/* 子级渲染逻辑：调用 SubSidebarItem */}
             {item.items?.map((sub) => (
-              <SidebarMenuSubItem key={sub.title}>
-                {/* 递归调用自身渲染下级 */}
-                {sub.items ? (
-                  <NavMainItem item={sub} />
-                ) : (
-                  <SidebarMenuSubButton
-                    isActive={location.pathname === sub.url}
-                    onClick={() => navigate(sub.url)}
-                  >
-                    <span>{sub.title}</span>
-                  </SidebarMenuSubButton>
-                )}
-              </SidebarMenuSubItem>
+              <SubSidebarItem key={sub.title} item={sub} />
             ))}
           </SidebarMenuSub>
         </CollapsibleContent>
       </SidebarMenuItem>
     </Collapsible>
+  );
+}
+
+// 2. 处理无限层级子菜单 (Nested Level)
+// 使用 SidebarMenuSubItem 和 SidebarMenuSubButton
+function SubSidebarItem({ item }: { item: MenuItem }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const hasChildren = item.items && item.items.length > 0;
+  const isActive = location.pathname.startsWith(item.url);
+
+  if (!hasChildren) {
+    return (
+      <SidebarMenuSubItem>
+        <SidebarMenuSubButton
+          isActive={location.pathname === item.url}
+          onClick={() => navigate(item.url)}
+        >
+          <span>{item.title}</span>
+        </SidebarMenuSubButton>
+      </SidebarMenuSubItem>
+    );
+  }
+
+  return (
+    <SidebarMenuSubItem>
+      <Collapsible asChild defaultOpen={isActive} className="group/collapsible">
+        {/* 注意：这里加一个 div 或者 Fragment 是为了让结构更清晰，
+            但 Collapsible 作为一个 Radix Primitive 也可以直接作为容器 */}
+        <div>
+          <CollapsibleTrigger asChild>
+            <SidebarMenuSubButton>
+              <span>{item.title}</span>
+              <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+            </SidebarMenuSubButton>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <SidebarMenuSub>
+              {/* 递归：子菜单继续调用 SubSidebarItem */}
+              {item.items?.map((sub) => (
+                <SubSidebarItem key={sub.title} item={sub} />
+              ))}
+            </SidebarMenuSub>
+          </CollapsibleContent>
+        </div>
+      </Collapsible>
+    </SidebarMenuSubItem>
   );
 }

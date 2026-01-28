@@ -2,19 +2,9 @@ import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse 
 import { router } from "@/routes";
 import { useAuthStore } from "@/stores";
 import { AuthError, NetworkError } from "@/errors";
+import type { ResponseResult } from "@/types/api";
 
 import { toast } from "sonner";
-
-/**
- * 后端响应信息主体
- */
-export interface ResponseResult<T> {
-  code: number;
-  message: string;
-  data: T;
-  success: boolean;
-  timestamp: number;
-}
 
 const instance: AxiosInstance = axios.create({
   baseURL: import.meta.env.MU_BASE_URL,
@@ -74,7 +64,7 @@ instance.interceptors.response.use(
 );
 
 function post<T = any, D = any>(url: string, data?: any, config?: AxiosRequestConfig<D>) {
-  return instance.post<ResponseResult<T>>(url, data, config);
+  return instance.post<ResponseResult<T>>(url, data, config) as unknown as Promise<T>;
 }
 
 export default instance;

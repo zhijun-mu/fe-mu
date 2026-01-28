@@ -4,16 +4,16 @@ import {
   useReactTable,
   getPaginationRowModel,
 } from "@tanstack/react-table";
-import TableHeader from "@/components/Table/TableHeader";
-import TableBody from "@/components/Table/TalbeBody";
-import TablePagination from "@/components/Table/TablePagination";
+import TableHeader from "@/components/DataTable/TableHeader";
+import TableBody from "@/components/DataTable/TalbeBody";
+import TablePagination from "@/components/DataTable/TablePagination";
 
 interface TableProps<TData, TValue> {
   data: TData[];
   columns: ColumnDef<TData, TValue>[];
 }
 
-export function Table<TData, TValue>({ data, columns }: TableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ data, columns }: TableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
