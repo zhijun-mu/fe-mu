@@ -1,10 +1,6 @@
 import { post } from "@/utils/request";
 import type { PageResult } from "@/types/api.ts";
 
-/**
- * 分页查询用户列表
- * 对应 Controller: /sys/user/page
- */
 export function page(data: object) {
   return post<PageResult<object>>("/sys/user/page", data);
 }

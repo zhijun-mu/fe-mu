@@ -1,8 +1,10 @@
-// 通用分页数据结构（泛型）
+/**
+ * 通用分页数据结构（泛型）
+ */
 export interface PageResult<T> {
   list: T[];
   total: number;
-  pageNum: number;
+  pageIndex: number;
   pageSize: number;
   pages: number;
 }
