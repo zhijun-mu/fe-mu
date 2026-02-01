@@ -2,7 +2,7 @@ import { lazy } from "react";
 import { createBrowserRouter, Navigate } from "react-router";
 
 import AdminLayout from "@/layouts/AdminLayout";
-import NotFound from "@/components/NotFound";
+import NotFound from "@/components/not-found";
 
 import LoginPage from "@/pages/login";
 import lazyLoad from "@/routes/lazyLoad.tsx";

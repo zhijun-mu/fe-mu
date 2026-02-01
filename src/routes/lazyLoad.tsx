@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 
-import Spin from "@/components/Spin";
+import Spin from "@/components/spin";
 
 const lazyLoad = (Comp: React.LazyExoticComponent<any>): React.ReactNode => {
   return (

@@ -4,9 +4,9 @@ import {
   useReactTable,
   getPaginationRowModel,
 } from "@tanstack/react-table";
-import TableHeader from "@/components/DataTable/TableHeader";
-import TableBody from "@/components/DataTable/TalbeBody";
-import TablePagination from "@/components/DataTable/TablePagination";
+import TableHeader from "@/components/data-table/table-header";
+import TableBody from "@/components/data-table/table-body";
+import TablePagination from "@/components/data-table/table-pagination";
 
 interface TableProps<TData, TValue> {
   data: TData[];
