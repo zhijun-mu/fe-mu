@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 
 import type { CrudContextValue } from "../types";
-import { useCrudConfig } from "../CrudPage";
+import { useCrudConfig } from "../context.ts";
 
 import { Button } from "@/components/ui/button.tsx";
 

@@ -1,14 +1,13 @@
 import { type ReactNode } from "react";
-import { createContext, useState, useMemo, useContext, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 
 import type { CrudApi, CrudContextValue, CrudPageParams } from "./types.ts";
+import { CrudContext } from "./context.ts";
 
 type CrudProviderProps<T> = {
   api?: CrudApi<T>;
   children: ReactNode;
 };
-
-const CrudContext = createContext<CrudContextValue<any> | null>(null);
 
 export function CrudProvider<T>({ api, children }: CrudProviderProps<T>) {
   const initialParams = {
@@ -74,12 +73,4 @@ export function CrudProvider<T>({ api, children }: CrudProviderProps<T>) {
   );
 
   return <CrudContext.Provider value={value}>{children}</CrudContext.Provider>;
-}
-
-export function useCrud<T>() {
-  const context = useContext(CrudContext);
-  if (!context) {
-    throw new Error("useCrud must be used inside <CrudProvider>");
-  }
-  return context as CrudContextValue<T>;
 }

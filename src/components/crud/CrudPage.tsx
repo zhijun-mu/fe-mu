@@ -1,7 +1,8 @@
-import { type ReactNode, useContext } from "react";
-import { createContext, useMemo } from "react";
+import { type ReactNode } from "react";
+import { useMemo } from "react";
 
 import type { CrudApi, CrudColumn, CrudFilterSchema } from "./types.ts";
+import { CrudConfigContext } from "./context.ts";
 import { CrudProvider } from "./CrudProvider.tsx";
 import { CrudQuerySlot } from "./slots/CrudQuerySlot.tsx";
 
@@ -13,8 +14,6 @@ export type CrudPageConfig<T> = {
   selectable?: boolean;
   pageSizeOptions?: number[];
 };
-
-const CrudConfigContext = createContext<CrudPageConfig<any> | null>(null);
 
 export type CrudPageProps<T> = {
   api?: CrudApi<T>;
@@ -34,10 +33,4 @@ export function CrudPage<T>(props: CrudPageProps<T>) {
       </CrudConfigContext.Provider>
     </CrudProvider>
   );
-}
-
-export function useCrudConfig<T>() {
-  const context = useContext(CrudConfigContext);
-  if (!context) throw new Error("useCrudConfig must be used within CrudPage");
-  return context as CrudPageConfig<T>;
 }
