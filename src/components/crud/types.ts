@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { PageResult } from "@/types/api.ts";
 
 export type RecordType = Record<string, any>;
+export type FilterType = "text" | "select" | "date" | "number";
 
 export type CrudPageParams = {
   pageIndex: number;
@@ -24,6 +25,17 @@ export interface CrudColumn<T = RecordType> {
   render?: (value: any, record: T) => ReactNode;
 }
 
+export interface CrudFilterSchema {
+  label: string;
+  name: string; // 对应后端接口的查询参数 key
+  type: FilterType;
+  placeholder?: string;
+  options?: { label: string; value: any }[]; // 供 select 使用
+  props?: Record<string, any>; // 传递给具体 UI 组件的额外属性
+}
+
 export type CrudContextValue<T> = {
   data: T[];
+  onSearch: (searchParams: RecordType) => void;
+  onReset: () => void;
 };

@@ -1,7 +1,7 @@
 import { type ReactNode } from "react";
 import { createContext, useState, useMemo, useContext, useCallback, useEffect } from "react";
 
-import type { CrudApi, CrudContextValue, CrudPageParams, CrudQueryParams } from "./types.ts";
+import type { CrudApi, CrudContextValue, CrudPageParams } from "./types.ts";
 
 type CrudProviderProps<T> = {
   api?: CrudApi<T>;
@@ -11,18 +11,19 @@ type CrudProviderProps<T> = {
 const CrudContext = createContext<CrudContextValue<any> | null>(null);
 
 export function CrudProvider<T>({ api, children }: CrudProviderProps<T>) {
+  const initialParams = {
+    pageIndex: 1,
+    pageSize: 25,
+  };
+
   const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<T[]>([]);
   const [page, setPage] = useState({
     total: 0,
-    pageIndex: 1,
-    pageSize: 25,
     pages: 0,
+    ...initialParams,
   });
-  const [queryParams, setQueryParams] = useState<CrudPageParams>({
-    pageIndex: 1,
-    pageSize: 25,
-  });
+  const [queryParams, setQueryParams] = useState<CrudPageParams>(initialParams);
 
   const loadTable = useCallback(async () => {
     if (!api || !api.page) return;
@@ -41,6 +42,21 @@ export function CrudProvider<T>({ api, children }: CrudProviderProps<T>) {
     }
   }, [api, queryParams]);
 
+  const onSearch = useCallback((searchParams: Record<string, any>) => {
+    setQueryParams((prev: any) => ({
+      pageIndex: prev.pageIndex,
+      pageSize: prev.pageSize,
+      ...searchParams,
+    }));
+  }, []);
+
+  const onReset = useCallback(() => {
+    setQueryParams((prev: CrudPageParams) => ({
+      pageIndex: 1,
+      pageSize: prev.pageSize,
+    }));
+  }, []);
+
   useEffect(() => {
     loadTable().then(() => {});
   }, [loadTable]);
@@ -51,8 +67,10 @@ export function CrudProvider<T>({ api, children }: CrudProviderProps<T>) {
       page,
       loading,
       queryParams,
+      onSearch,
+      onReset,
     }),
-    [data, page, loading, queryParams],
+    [data, page, loading, queryParams, onSearch, onReset],
   );
 
   return <CrudContext.Provider value={value}>{children}</CrudContext.Provider>;
