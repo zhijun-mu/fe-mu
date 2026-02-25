@@ -1,4 +1,3 @@
-import { useId } from "react";
 import { useForm } from "react-hook-form";
 
 import type { CrudContextValue } from "../types";
@@ -12,8 +11,6 @@ type Props<T> = {
 
 export function CrudFilters<T>({ crud }: Props<T>) {
   const { filters } = useCrudConfig<T>();
-
-  const baseId = useId();
 
   const { register, handleSubmit, reset } = useForm();
 
@@ -35,22 +32,18 @@ export function CrudFilters<T>({ crud }: Props<T>) {
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
         {filters.map((field) => {
-          const fieldId = `${baseId}-${field.name}`;
-
           return (
-            <div key={field.name}>
-              <label htmlFor={fieldId}>{field.label}</label>
-              <input id={fieldId} type="text" {...register(field.name)} />
-            </div>
+            <label key={field.name}>
+              {field.label}
+              <input type="text" {...register(field.name)} />
+            </label>
           );
         })}
 
-        <div className="flex flex-wrap items-center gap-2 md:flex-row">
-          <Button type="submit">查询</Button>
-          <Button type="button" variant="outline" onClick={handleReset}>
-            重置
-          </Button>
-        </div>
+        <Button type="submit">查询</Button>
+        <Button type="button" variant="outline" onClick={handleReset}>
+          重置
+        </Button>
       </form>
     </div>
   );
