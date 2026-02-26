@@ -29,6 +29,7 @@ export function DataTable<TData, TValue>({
   const cols = (columns || []).map((column) => ({
     accessorKey: column.dataIndex,
     header: column.title,
+    ...(column.cell !== undefined && { cell: column.cell }),
   })) as ColumnDef<TData, TValue>[];
 
   // 判断是否传入了 pagination，如果是，则说明接管了分页（服务端分页）

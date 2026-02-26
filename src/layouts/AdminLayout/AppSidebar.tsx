@@ -56,8 +56,8 @@ const data = {
           url: "#",
           icon: FileText,
           items: [
+            { title: "登录日志", url: "/sys/login-log" },
             { title: "操作日志", url: "/sys/log/opt" },
-            { title: "登录日志", url: "/sys/log/login" },
           ],
         },
       ],

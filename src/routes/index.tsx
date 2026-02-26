@@ -22,6 +22,7 @@ export const router = createBrowserRouter([
         children: [
           { path: "user", element: lazyLoad(lazy(() => import("@/pages/sys/user"))) },
           { path: "role", element: lazyLoad(lazy(() => import("@/pages/sys/role"))) },
+          { path: "login-log", element: lazyLoad(lazy(() => import("@/pages/sys/login-log"))) },
         ],
       },
     ],

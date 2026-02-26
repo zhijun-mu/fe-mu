@@ -4,6 +4,8 @@ import type { CrudContextValue } from "../types";
 import { useCrudConfig } from "../context.ts";
 
 import { Button } from "@/components/ui/button.tsx";
+import { Input } from "@/components/ui/input.tsx";
+import { Field, FieldLabel } from "@/components/ui/field.tsx";
 
 type Props<T> = {
   crud: CrudContextValue<T>;
@@ -25,14 +27,16 @@ export function CrudFilters<T>({ crud }: Props<T>) {
   if (!Array.isArray(filters) || filters.length === 0) return null;
 
   return (
-    <div>
+    <div className="p-1.5">
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-wrap items-center gap-4">
         {filters.map((field) => {
           return (
-            <label key={field.name}>
-              {field.label}
-              <input type="text" {...register(field.name)} />
-            </label>
+            <Field orientation="horizontal" className="w-fit" key={field.name}>
+              <FieldLabel className="whitespace-nowrap">
+                {field.label}
+                <Input className="h-8 text-xs" {...register(field.name)} />
+              </FieldLabel>
+            </Field>
           );
         })}
 
