@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { CrudFilters } from "../schema/CrudFilters.tsx";
+import { CrudFilters } from "../schema";
 import { useCrud } from "../context.ts";
 
 type SlotProps = {

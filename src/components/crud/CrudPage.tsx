@@ -4,8 +4,7 @@ import { useMemo } from "react";
 import type { CrudApi, CrudFilterSchema } from "./types.ts";
 import { CrudConfigContext } from "./context.ts";
 import { CrudProvider } from "./CrudProvider.tsx";
-import { CrudQuerySlot } from "./slots/CrudQuerySlot.tsx";
-import { CrudTableSlot } from "./slots/CrudTableSlot.tsx";
+import { CrudQuerySlot, CrudTableSlot } from "./slots";
 import type { ColumnsType } from "@/components/data-table/types.ts";
 
 export type CrudPageConfig<T> = {
