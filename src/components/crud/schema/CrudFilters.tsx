@@ -11,22 +11,18 @@ type Props<T> = {
 
 export function CrudFilters<T>({ crud }: Props<T>) {
   const { filters } = useCrudConfig<T>();
-
   const { register, handleSubmit, reset } = useForm();
 
   const onSubmit = (values: any) => {
-    (crud as any).onSearch?.(values);
-    crud.onSearch(values);
+    crud.onFilter(values);
   };
 
   const handleReset = () => {
-    reset();
-    (crud as any).onReset?.();
+    reset(); // 清理前端 UI 的 Form 状态
+    crud.onReset(); // 清理并重置后端的查询参数
   };
 
-  if (!Array.isArray(filters) || filters.length === 0) {
-    return null;
-  }
+  if (!Array.isArray(filters) || filters.length === 0) return null;
 
   return (
     <div>
