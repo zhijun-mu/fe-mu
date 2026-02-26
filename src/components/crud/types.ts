@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import type { PageResult } from "@/types/api.ts";
 
 export type RecordType = Record<string, any>;
@@ -18,12 +17,12 @@ export type CrudApi<T> = {
   remove?: (id: string | number) => Promise<any>;
 };
 
-export interface CrudColumn<T = RecordType> {
-  title: string;
-  dataIndex: keyof T;
-  width?: number | string;
-  render?: (value: any, record: T) => ReactNode;
-}
+// export interface CrudColumn<T = RecordType> {
+//   title: string;
+//   dataIndex: keyof T;
+//   width?: number | string;
+//   render?: (value: any, record: T) => ReactNode;
+// }
 
 export interface CrudFilterSchema {
   label: string;

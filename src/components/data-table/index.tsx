@@ -7,16 +7,22 @@ import {
 import TableHeader from "@/components/data-table/table-header";
 import TableBody from "@/components/data-table/table-body";
 import TablePagination from "@/components/data-table/table-pagination";
+import type { ColumnsType } from "@/components/data-table/types.ts";
 
 interface TableProps<TData, TValue> {
   data: TData[];
-  columns: ColumnDef<TData, TValue>[];
+  columns: ColumnsType<TData, TValue>[];
 }
 
 export function DataTable<TData, TValue>({ data, columns }: TableProps<TData, TValue>) {
+  const cols = (columns || []).map((column) => ({
+    accessorKey: column.dataIndex,
+    header: column.title,
+  })) as ColumnDef<TData, TValue>[];
+
   const table = useReactTable({
     data,
-    columns,
+    columns: cols,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     initialState: {

@@ -4,7 +4,7 @@ import type { CrudPageConfig } from "@/components/crud/CrudPage.tsx";
 
 export const CrudContext = createContext<CrudContextValue<any> | null>(null);
 
-export function useCrud<T>() {
+export function useCrud<T = any>() {
   const context = useContext(CrudContext);
   if (!context) {
     throw new Error("useCrud 必须在 <CrudProvider> 标签内使用。");
