@@ -1,5 +1,22 @@
 import type { Table as TableInstance } from "@tanstack/react-table";
 
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { Field, FieldLabel } from "@/components/ui/field.tsx";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 interface TablePaginationProps<TData> {
   table: TableInstance<TData>;
 }
@@ -7,70 +24,61 @@ interface TablePaginationProps<TData> {
 export default function TablePagination<TData>({ table }: TablePaginationProps<TData>) {
   return (
     <>
-      <div className="h-2" />
-      <div className="flex items-center gap-2">
-        <button
-          className="border rounded p-1"
-          onClick={() => table.firstPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          {"<<"}
-        </button>
-        <button
-          className="border rounded p-1"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          {"<"}
-        </button>
-        <button
-          className="border rounded p-1"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          {">"}
-        </button>
-        <button
-          className="border rounded p-1"
-          onClick={() => table.lastPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          {">>"}
-        </button>
-        <span className="flex items-center gap-1">
-          <div>Page</div>
-          <strong>
-            {table.getState().pagination.pageIndex + 1} of {table.getPageCount().toLocaleString()}
-          </strong>
-        </span>
-        <span className="flex items-center gap-1">
-          | Go to page:
-          <input
-            type="number"
-            min="1"
-            max={table.getPageCount()}
-            defaultValue={table.getState().pagination.pageIndex + 1}
-            onChange={(e) => {
-              const page = e.target.value ? Number(e.target.value) - 1 : 0;
-              table.setPageIndex(page);
-            }}
-            className="border p-1 rounded w-16"
-          />
-        </span>
-
-        <select
-          value={table.getState().pagination.pageSize}
-          onChange={(e) => {
-            table.setPageSize(Number(e.target.value));
-          }}
-        >
-          {[25, 50, 100, 200].map((pageSize) => (
-            <option key={pageSize} value={pageSize}>
-              每页 {pageSize} 条
-            </option>
-          ))}
-        </select>
-      </div>
+      <Pagination className="p-1.5 justify-end">
+        <PaginationContent className="gap-2">
+          <PaginationItem>
+            <FieldLabel>
+              共 <strong>{table.getPageCount().toLocaleString()} </strong>页
+            </FieldLabel>
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationPrevious
+              size="sm"
+              href={!table.getCanPreviousPage() ? undefined : "#"}
+              className={!table.getCanPreviousPage() ? "pointer-events-none opacity-50" : undefined}
+              aria-disabled={!table.getCanPreviousPage()}
+              onClick={() => table.previousPage()}
+            />
+          </PaginationItem>
+          <PaginationItem>
+            <strong>{table.getState().pagination.pageIndex + 1} </strong>
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationNext
+              size="sm"
+              href={!table.getCanNextPage() ? undefined : "#"}
+              className={!table.getCanNextPage() ? "pointer-events-none opacity-50" : undefined}
+              aria-disabled={!table.getCanNextPage()}
+              onClick={() => table.nextPage()}
+            />
+          </PaginationItem>
+          <PaginationItem>
+            <Field orientation="horizontal" className="w-fit">
+              <FieldLabel>每页</FieldLabel>
+              <Select
+                value={String(table.getState().pagination.pageSize)}
+                onValueChange={(value) => {
+                  table.setPageSize(Number(value));
+                }}
+              >
+                <SelectTrigger className="w-20" size="sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent align="start">
+                  <SelectGroup>
+                    {[25, 50, 100].map((pageSize) => (
+                      <SelectItem key={pageSize} value={String(pageSize)}>
+                        {pageSize}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <FieldLabel>条</FieldLabel>
+            </Field>
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </>
   );
 }

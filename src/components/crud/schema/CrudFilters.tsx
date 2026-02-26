@@ -26,7 +26,7 @@ export function CrudFilters<T>({ crud }: Props<T>) {
 
   return (
     <div>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-wrap items-center gap-4">
         {filters.map((field) => {
           return (
             <label key={field.name}>
@@ -36,10 +36,14 @@ export function CrudFilters<T>({ crud }: Props<T>) {
           );
         })}
 
-        <Button type="submit">查询</Button>
-        <Button type="button" variant="outline" onClick={handleReset}>
-          重置
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button type="submit" size="sm">
+            查询
+          </Button>
+          <Button type="button" size="sm" variant="outline" onClick={handleReset}>
+            重置
+          </Button>
+        </div>
       </form>
     </div>
   );
