@@ -24,7 +24,7 @@ interface TablePaginationProps<TData> {
 export default function TablePagination<TData>({ table }: TablePaginationProps<TData>) {
   return (
     <>
-      <Pagination className="p-1.5 justify-end">
+      <Pagination className="justify-end">
         <PaginationContent className="gap-2">
           <PaginationItem>
             <FieldLabel>

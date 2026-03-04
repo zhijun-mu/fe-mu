@@ -1,14 +1,15 @@
+import { type ForwardedRef, forwardRef, type ReactElement, useImperativeHandle } from "react";
 import {
   type ColumnDef,
   type PaginationState,
   type OnChangeFn,
+  type Table as TableInstance,
   getCoreRowModel,
   useReactTable,
   getPaginationRowModel,
 } from "@tanstack/react-table";
 import TableHeader from "@/components/data-table/table-header";
 import TableBody from "@/components/data-table/table-body";
-import TablePagination from "@/components/data-table/table-pagination";
 import type { ColumnsType } from "@/components/data-table/types.ts";
 
 interface TableProps<TData, TValue> {
@@ -19,13 +20,10 @@ interface TableProps<TData, TValue> {
   onPaginationChange?: OnChangeFn<PaginationState>;
 }
 
-export function DataTable<TData, TValue>({
-  data,
-  columns,
-  pageCount,
-  pagination,
-  onPaginationChange,
-}: TableProps<TData, TValue>) {
+function DataTableInner<TData, TValue>(
+  { data, columns, pageCount, pagination, onPaginationChange }: TableProps<TData, TValue>,
+  ref: ForwardedRef<TableInstance<TData>>,
+) {
   const cols = (columns || []).map((column) => ({
     accessorKey: column.dataIndex,
     header: column.title,
@@ -47,6 +45,9 @@ export function DataTable<TData, TValue>({
     onPaginationChange: onPaginationChange,
   });
 
+  // 将 table 实例暴露给外部 ref
+  useImperativeHandle(ref, () => table, [table]);
+
   return (
     <>
       <table>
@@ -54,7 +55,12 @@ export function DataTable<TData, TValue>({
         <TableBody table={table} />
       </table>
 
-      <TablePagination table={table} />
+      {/*<TablePagination table={table} />*/}
     </>
   );
 }
+
+// 核心修正：使用类型转换来保持泛型支持，解决 JSX 组件识别错误
+export const DataTable = forwardRef(DataTableInner) as <TData, TValue>(
+  props: TableProps<TData, TValue> & { ref?: ForwardedRef<TableInstance<TData>> },
+) => ReactElement;

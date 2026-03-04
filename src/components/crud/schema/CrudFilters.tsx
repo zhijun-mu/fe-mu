@@ -27,7 +27,7 @@ export function CrudFilters<T>({ crud }: Props<T>) {
   if (!Array.isArray(filters) || filters.length === 0) return null;
 
   return (
-    <div className="p-1.5">
+    <>
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-wrap items-center gap-4">
         {filters.map((field) => {
           return (
@@ -49,6 +49,6 @@ export function CrudFilters<T>({ crud }: Props<T>) {
           </Button>
         </div>
       </form>
-    </div>
+    </>
   );
 }

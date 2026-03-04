@@ -30,8 +30,14 @@ export function CrudPage<T>(props: CrudPageProps<T>) {
   return (
     <CrudProvider<T> api={api}>
       <CrudConfigContext.Provider value={config}>
-        <CrudQuerySlot></CrudQuerySlot>
-        <CrudTableSlot></CrudTableSlot>
+        <div className="flex flex-1 min-h-0 h-full w-full flex-col">
+          <div className="flex-none shrink-0 p-1.5">
+            <CrudQuerySlot></CrudQuerySlot>
+          </div>
+          <div className="flex flex-1 min-h-0 flex-col pl-1.5 pr-1.5">
+            <CrudTableSlot></CrudTableSlot>
+          </div>
+        </div>
       </CrudConfigContext.Provider>
     </CrudProvider>
   );
