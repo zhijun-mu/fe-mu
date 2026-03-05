@@ -27,6 +27,11 @@ function DataTableInner<TData, TValue>(
   const cols = (columns || []).map((column) => ({
     accessorKey: column.dataIndex,
     header: column.title,
+    meta: {
+      width: column.width,
+      minWidth: column.minWidth,
+      maxWidth: column.maxWidth,
+    },
     ...(column.cell !== undefined && { cell: column.cell }),
   })) as ColumnDef<TData, TValue>[];
 
@@ -49,14 +54,14 @@ function DataTableInner<TData, TValue>(
   useImperativeHandle(ref, () => table, [table]);
 
   return (
-    <>
-      <table>
+    <div style={{ width: "100%", overflowX: "auto" }}>
+      <table style={{ width: "100%", minWidth: "max-content", tableLayout: "fixed" }}>
         <TableHeader table={table} />
         <TableBody table={table} />
       </table>
 
       {/*<TablePagination table={table} />*/}
-    </>
+    </div>
   );
 }
 
